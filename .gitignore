@@ -1,0 +1,32 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated pipeline outputs / cloud artifacts
+outputs/
+artifacts/
+mlruns/
+
+# Generated sales can be recreated and may grow
+data/sales/
+
+# Azure local metadata / secrets
+.azure/
+.env
+*.pem
+*.key
