@@ -1,0 +1,24 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+display_name: wkr-calendar-pipeline
+experiment_name: wkr-calendar
+code: ..
+command: >-
+  python src/wkr_pipeline/calendar_pipeline.py
+  --start-year 2017
+  --end-year 2026
+  --legacy ${{inputs.legacy_calendar}}
+  --output ${{outputs.calendar}}/datumlanderferienfeiertage.csv
+  --comparison-dir ${{outputs.comparison}}
+inputs:
+  legacy_calendar:
+    type: uri_file
+    path: ../data/raw/datumlanderferienfeiertage.csv
+outputs:
+  calendar:
+    type: uri_folder
+  comparison:
+    type: uri_folder
+environment:
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04
+  conda_file: environment.yml
+compute: azureml:cpu-cluster
