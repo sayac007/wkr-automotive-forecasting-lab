@@ -1,0 +1,29 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+display_name: wkr-sales-forecast
+experiment_name: wkr-sales-forecast
+code: ..
+command: >-
+  Rscript R/generate_sales_daily_de.R &&
+  python src/wkr_pipeline/sales_forecast_pipeline.py
+  --sales data/sales/sales_daily_de.csv
+  --calendar ${{inputs.calendar}}
+  --market ${{inputs.market}}
+  --market-forecast ${{inputs.market_forecast}}
+  --output-dir ${{outputs.forecast}}
+inputs:
+  calendar:
+    type: uri_file
+    path: ../data/raw/datumlanderferienfeiertage.csv
+  market:
+    type: uri_file
+    path: ../data/raw/automotive_market_de.csv
+  market_forecast:
+    type: uri_file
+    path: ../data/forecast/automotive_market_de_forecast_2026.csv
+outputs:
+  forecast:
+    type: uri_folder
+environment:
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04
+  conda_file: sales_forecast_environment.yml
+compute: azureml:cpu-cluster
