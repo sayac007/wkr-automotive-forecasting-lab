@@ -19,14 +19,22 @@ The analytical baseline and the first cloud execution layer are working. The rep
 - statistical holdout diagnostics including MAE, RMSE, MAPE, bias, Durbin-Watson, residual ACF and Ljung-Box tests;
 - German calendar inputs and a Python calendar pipeline;
 - Azure ML command-job definitions for both the calendar pipeline and the sales forecast;
-- persisted Azure ML outputs for forecast results, diagnostics and plots.
+- persisted Azure ML outputs for forecast results, diagnostics and plots;
+- an installable Python package configured through `pyproject.toml`;
+- automated tests with `pytest`;
+- static code checks with Ruff;
+- a GitHub Actions CI workflow running installation, linting and tests on a clean Ubuntu environment.
 
-Two workloads have now been executed successfully from the versioned GitHub repository on Azure Machine Learning:
+Two workloads have been executed successfully from the versioned GitHub repository on Azure Machine Learning:
 
 1. the German calendar generation/validation pipeline;
 2. the complete WKR German sales forecast.
 
 The sales-forecast run also exposed a real data-contract problem in the repository: the automotive market input was missing `registrations_bev`. The input was corrected in GitHub and the unchanged Azure job was rerun successfully. This is the intended operating pattern: source and definitions live in GitHub; Azure executes a specific repository state and persists the resulting artifacts.
+
+The first GitHub Actions CI runs also exposed real engineering issues: lint violations in the calendar pipeline and tests that still imported Python modules through the repository `src` directory. These were corrected rather than bypassed. Tests now run against the installed `wkr_pipeline` package.
+
+The current CI pipeline is green.
 
 ## Latest validated Azure sales forecast
 
@@ -65,7 +73,7 @@ Dec 2026    EUR 21.65m
 Sep-Dec     EUR 111.89m
 ```
 
-Residual diagnostics show remaining positive serial correlation across the segment models (Durbin-Watson approximately 1.23-1.27; ACF(1) approximately 0.36-0.38; ACF(7) approximately 0.24-0.27; Ljung-Box tests strongly reject residual independence). This limitation is retained explicitly rather than hidden by adding dynamics that did not improve the earlier recursive business-forecast design sufficiently.
+Residual diagnostics show remaining positive serial correlation across the segment models (Durbin-Watson approximately 1.23–1.27; ACF(1) approximately 0.36–0.38; ACF(7) approximately 0.24–0.27; Ljung-Box tests strongly reject residual independence). This limitation is retained explicitly rather than hidden by adding dynamics that did not improve the earlier recursive business-forecast design sufficiently.
 
 Detailed acceptance information is recorded in [`docs/decisions/0004-first-cloud-sales-forecast.md`](docs/decisions/0004-first-cloud-sales-forecast.md).
 
@@ -78,19 +86,23 @@ For the shell-based GitHub-to-Azure workflow, see [`docs/run-github-code-on-azur
 ## Repository layout
 
 ```text
-R/                  analytical reference implementation and synthetic-data generators
-src/wkr_pipeline/   production-oriented Python pipeline code
-tests/              automated tests
-azureml/            Azure ML job/environment definitions
-data/               small project inputs and generated reference data
-docs/               architecture, data contracts, runbooks and engineering decisions
+R/                    analytical reference implementation and synthetic-data generators
+src/wkr_pipeline/     installable Python package and production-oriented pipeline code
+tests/                automated pytest tests
+.github/workflows/    GitHub Actions CI
+azureml/              Azure ML job/environment definitions
+data/                 small project inputs and generated reference data
+docs/                 architecture, data contracts, runbooks and engineering decisions
+pyproject.toml        Python package, dependencies and development-tool configuration
 ```
 
 ## Reproducibility
 
 R scripts use relative project paths and fixed seeds where synthetic data are generated. Azure ML jobs declare their code, inputs, outputs, environment and compute in version-controlled YAML.
 
-The current execution pattern is:
+For Python development, dependencies and development tools are declared in `pyproject.toml`. CI installs the project into a clean environment before running Ruff and pytest, so automated tests do not depend on a developer's local repository layout or Python path.
+
+The current cloud execution pattern is:
 
 ```text
 GitHub
@@ -118,8 +130,35 @@ Generated Azure run artifacts are retained by Azure ML rather than committed bac
 
 ## Engineering roadmap
 
-The forecasting workload is now the stable base for the next phase:
+The forecasting workload is now the stable analytical base. The next goal is to turn it into a small but realistic ML decision system rather than treating infrastructure technologies as isolated learning exercises.
 
-**reproducible forecast workload → productionization → CI/CD → Docker → Kubernetes/AKS → serving/API → monitoring → RAG/evaluation → MCP/agent integration**
+Current engineering status:
 
-The roadmap is intentionally incremental: each layer is added to the same WKR workload rather than as a disconnected technology demo.
+```text
+Forecasting baseline             done
+Azure ML execution               done
+Installable Python package       done
+Automated tests                  done
+Ruff static checks               done
+GitHub Actions CI                done
+Experiment tracking             next
+```
+
+The next planned step is **MLflow experiment tracking** for the existing forecasting workload.
+
+After that, WKR will evolve incrementally toward:
+
+```text
+forecast
+  -> experiment tracking and reproducibility
+  -> containerized serving / API
+  -> cloud deployment
+  -> logging, monitoring and observability
+  -> forecast-to-decision layer
+  -> agent/tool integration
+  -> systematic evaluation
+```
+
+Where mature open-source solutions already exist, WKR will reuse and adapt established patterns rather than reimplementing infrastructure for its own sake. Project-specific development will focus increasingly on the automotive forecasting and decision problem.
+
+Relevant ecosystems and reference projects include sktime and PyTorch Forecasting for forecasting, MLflow for experiment tracking and observability, and established MLOps and serving projects for later production stages.
