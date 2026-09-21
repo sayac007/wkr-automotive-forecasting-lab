@@ -1,5 +1,5 @@
 from datetime import date
-from src.wkr_pipeline.calendar_pipeline import easter_sunday, demand_feature_dates
+from wkr_pipeline.calendar_pipeline import easter_sunday, demand_feature_dates
 
 def test_easter_2026():
     assert easter_sunday(2026) == date(2026, 4, 5)
