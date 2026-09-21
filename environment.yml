@@ -1,0 +1,13 @@
+name: wkr-hypoforge-forecast
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - r-base=4.3
+  - git
+  - numpy
+  - pandas
+  - scipy
+  - statsmodels
+  - matplotlib
+  - scikit-learn>=1.4
