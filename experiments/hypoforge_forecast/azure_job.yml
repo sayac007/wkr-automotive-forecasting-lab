@@ -1,15 +1,9 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-display_name: wkr-hypoforge-forecast-experiment
+display_name: wkr-hypoforge-forecast-challenger
 experiment_name: wkr-hypoforge-forecast
 code: ../..
 command: >-
   Rscript R/generate_sales_daily_de.R &&
-  rm -rf .external/hypoforge &&
-  mkdir -p .external &&
-  git clone --depth 1
-  https://github.com/sayac007/HypoForge-Feature-Discovery-v0.2.git
-  .external/hypoforge &&
-  PYTHONPATH=.external:src
   python experiments/hypoforge_forecast/run.py
   --sales data/sales/sales_daily_de.csv
   --calendar ${{inputs.calendar}}
