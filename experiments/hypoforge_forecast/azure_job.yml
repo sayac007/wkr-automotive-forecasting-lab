@@ -4,7 +4,7 @@ experiment_name: wkr-hypoforge-forecast
 code: ../..
 command: >-
   Rscript R/generate_sales_daily_de.R &&
-  python experiments/hypoforge_forecast/run.py
+  PYTHONPATH=src python experiments/hypoforge_forecast/run.py
   --sales data/sales/sales_daily_de.csv
   --calendar ${{inputs.calendar}}
   --market ${{inputs.market}}
