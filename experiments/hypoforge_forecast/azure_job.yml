@@ -1,5 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-display_name: wkr-hypoforge-forecast-challenger
+display_name: wkr-hypoforge-v03-forecast-challenger
 experiment_name: wkr-hypoforge-forecast
 code: ../..
 command: >-

@@ -13,4 +13,4 @@ dependencies:
   - scikit-learn>=1.4
   - pip
   - pip:
-      - "hypoforge @ git+https://github.com/sayac007/HypoForge-Feature-Discovery-v0.2.git@68ffe578c09eecf9500cee172fc74d0a727ef7a4"
+      - "hypoforge @ git+https://github.com/sayac007/HypoForge-Feature-Discovery.git@243a1f1c97ffd122be16ae4508581b32a2001d37"
